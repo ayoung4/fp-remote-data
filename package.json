@@ -1,7 +1,7 @@
 {
   "name": "fp-remote-data",
   "version": "1.0.3",
-  "description": "",  
+  "description": "",
   "main": "lib/index.js",
   "files": [
     "lib"
@@ -24,6 +24,7 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
+    "assert": "^2.0.0",
     "fp-ts": "^2.7.0"
   }
 }

@@ -1,109 +1,105 @@
-import { expect } from 'chai';
+import * as assert from 'assert';
 import { describe, it } from 'mocha';
-import { pipe, identity, flow } from 'fp-ts/lib/function';
+import * as E from 'fp-ts/lib/Either';
+import * as O from 'fp-ts/lib/Option';
+import * as T from 'fp-ts/lib/These';
+import { pipe } from 'fp-ts/lib/function';
 
-import * as RD from '../src/RefreshableData';
+import * as _ from '../src/RefreshableData';
 
-describe('RefreshableData', function () {
+const p = (n: number): boolean => n > 2
 
-    describe('constructors', function () {
+describe('RefreshableData', () => {
+    describe('pipeables', () => {
+        it('map', () => {
+            const double = (n: number) => n * 2
+            assert.deepStrictEqual(pipe(_.success(2, false), _.map(double)), _.success(4, false))
+            assert.deepStrictEqual(pipe(_.failure(2, false), _.map(double)), _.failure(2, false))
+        })
 
-        it('creates a failure state', function () {
+        it('ap', () => {
+            const double = (n: number) => n * 2
+            assert.deepStrictEqual(pipe(_.success(double, false), _.ap(_.success(2, false))), _.success(4, false))
+            assert.deepStrictEqual(pipe(_.success(double, false), _.ap(_.failure(2, false))), _.failure(2, false))
+            assert.deepStrictEqual(pipe(_.failure(2, false), _.ap(_.success(2, false))), _.failure(2, false))
+            assert.deepStrictEqual(pipe(_.failure(2, false), _.ap(_.failure(2, false))), _.failure(2, false))
+        })
 
-            const err = 'an error';
-            const refreshing = false;
-            const failure = RD.failure(err, refreshing);
-            expect(failure._tag).to.equal(RD.Tags.failure);
-            expect(failure.error).to.equal(err);
-            expect(failure.refreshing).to.equal(refreshing);
+        it('apFirst', () => {
+            assert.deepStrictEqual(pipe(_.success('a', false), _.apFirst(_.success('b', false))), _.success('a', false))
+        })
 
-        });
+        it('apSecond', () => {
+            assert.deepStrictEqual(pipe(_.success('a', false), _.apSecond(_.success('b', false))), _.success('b', false))
+        })
 
-        it('creates a success state', function () {
+        it('chain', () => {
+            const f = (n: number) => _.success(n * 2, false)
+            const g = () => _.failure(2, false)
+            assert.deepStrictEqual(pipe(_.success(1, false), _.chain(f)), _.success(2, false))
+            assert.deepStrictEqual(pipe(_.failure(1, false), _.chain(f)), _.failure(1, false))
+            assert.deepStrictEqual(pipe(_.success(1, false), _.chain(g)), _.failure(2, false))
+            assert.deepStrictEqual(pipe(_.failure(1, false), _.chain(g)), _.failure(1, false))
+        })
 
-            const res = 'a result';
-            const refreshing = false;
-            const failure = RD.success(res, refreshing);
-            expect(failure._tag).to.equal(RD.Tags.success);
-            expect(failure.result).to.equal(res);
-            expect(failure.refreshing).to.equal(refreshing);
+        it('chainFirst', () => {
+            const f = (n: number) => _.success(n * 2, false)
+            assert.deepStrictEqual(pipe(_.success(1, false), _.chainFirst(f)), _.success(1, false))
+        })
 
-        });
+        it('flatten', () => {
+            assert.deepStrictEqual(pipe(_.success(_.success(1, false), false), _.flatten), _.success(1, false))
+        })
 
-        it('creates a both state', function () {
+    })
 
-            const err = 'an error';
-            const res = 'a result';
-            const refreshing = false;
-            const failure = RD.both(err, res, refreshing);
-            expect(failure._tag).to.equal(RD.Tags.both);
-            expect(failure.result).to.equal(res);
-            expect(failure.refreshing).to.equal(refreshing);
+    describe('constructors', () => {
+        it('fromOption', () => {
+            assert.deepStrictEqual(_.fromOption(() => 2)(O.none), _.failure(2, false))
+            assert.deepStrictEqual(_.fromOption(() => 2)(O.some(1)), _.success(1, false))
+        })
+        it('fromEither', () => {
+            assert.deepStrictEqual(_.fromEither(E.left('a')), _.failure('a', false))
+            assert.deepStrictEqual(_.fromEither(E.right(1)), _.success(1, false))
+        })
+        it('fromThese', () => {
+            assert.deepStrictEqual(_.fromThese(T.left('a')), _.failure('a', false))
+            assert.deepStrictEqual(_.fromThese(T.right(1)), _.success(1, false))
+            assert.deepStrictEqual(_.fromThese(T.both('a', 1)), _.both('a', 1, false))
+        })
+        it('fromPredicate', () => {
+            const f = _.fromPredicate(p, () => 'failure')
+            assert.deepStrictEqual(f(1), _.failure('failure', false))
+            assert.deepStrictEqual(f(3), _.success(3, false))
 
-        });
+            type Direction = 'asc' | 'desc'
+            const parseDirection = _.fromPredicate(
+                (s: string): s is Direction => s === 'asc' || s === 'desc',
+                () => 'failure',
+            )
+            assert.deepStrictEqual(parseDirection('asc'), _.success('asc', false))
+            assert.deepStrictEqual(parseDirection('foo'), _.failure('failure', false))
+        })
+    })
 
-    });
+    it('fold', () => {
+        const f = () => 'init';
+        const g = () => 'pending';
+        const h = (s: string) => `failure${s.length}`
+        const i = (n: number) => `success${n}`
+        const j = (s: string, n: number) => `both${s.length}${n}`
+        const fold = _.fold<string, number, string>({
+            init: f,
+            pending: g,
+            failure: h,
+            success: i,
+            both: j,
+        })
+        assert.deepStrictEqual(fold(_.init()), 'init')
+        assert.deepStrictEqual(fold(_.pending()), 'pending')
+        assert.deepStrictEqual(fold(_.failure('abc', false)), 'failure3')
+        assert.deepStrictEqual(fold(_.success(3, false)), 'success3')
+        assert.deepStrictEqual(fold(_.both('abc', 3, false)), 'both33')
+    })
 
-    describe('functor', function () {
-
-        it('has identity', function () {
-
-            const A = RD.success(10, false);
-            const left = pipe(
-                A,
-                RD.map(identity),
-            );
-
-            expect(left).to.deep.equal(A);
-
-        });
-
-        it('has composition', function () {
-
-            const f = (x: number) => x + 5;
-            const g = String;
-            const A = RD.success(10, false);
-            const left = pipe(
-                A,
-                RD.map(f),
-                RD.map(g),
-            );
-            const right = pipe(
-                A,
-                RD.map(flow(f, g)),
-            );
-
-            expect(left).to.deep.equal(right);
-
-        });
-
-    });
-
-    describe('foldable', function () {
-
-        it('folds all states', function () {
-
-            const A = RD.init;
-            const B = RD.pending;
-            const C = RD.failure(10, false);
-            const D = RD.success(15, false);
-            const E = RD.both(10, 15, false);
-            const f = RD.fold<number, number, number>({
-                init: () => 5,
-                pending: () => 7,
-                failure: ({ error }) => error,
-                success: ({ result }) => result,
-                both: ({ error, result }) => error + result,
-            })
-
-            expect(f(A)).to.deep.equal(5);
-            expect(f(B)).to.deep.equal(7);
-            expect(f(C)).to.deep.equal(10);
-            expect(f(D)).to.deep.equal(15);
-            expect(f(E)).to.deep.equal(25);
-
-        });
-
-    });
-
-});
+})
