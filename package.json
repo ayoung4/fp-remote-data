@@ -1,0 +1,29 @@
+{
+  "name": "fp-remote-data",
+  "version": "1.0.3",
+  "description": "",  
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "lint": "tslint --project tsconfig.json",
+    "build": "npm run clean && npm run compile",
+    "clean": "rm -rf ./lib",
+    "compile": "tsc -p tsconfig.json",
+    "test": "ts-mocha ./tests/*.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^8.0.0",
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1",
+    "ts-mocha": "^7.0.0",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "fp-ts": "^2.7.0"
+  }
+}
