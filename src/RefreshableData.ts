@@ -204,7 +204,7 @@ export const MonadThrow: MonadThrow2<URI> = {
     throwError: (e) => failure(e, false),
 };
 
-export const remoteData: Functor2<URI>
+export const refreshableData: Functor2<URI>
     & Bifunctor2<URI>
     & Chain2<URI>
     & MonadThrow2<URI>
