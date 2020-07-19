@@ -15,6 +15,7 @@ yarn:
 ## RemoteData
 
 ### Description
+
 A union type representing the following states:
 - Initial
 - Pending
@@ -22,6 +23,8 @@ A union type representing the following states:
 - Success
 
 Implements the Bifunctor and MonadThrow interfaces in fp-ts.
+
+> Useful when loading data that should only be loaded once.
 
 ### Constructors
 
@@ -64,6 +67,7 @@ Implements the Bifunctor and MonadThrow interfaces in fp-ts.
 ## RefreshableData
 
 ### Description
+
 A union type representing the following states:
 - Initial
 - Pending
@@ -72,6 +76,8 @@ A union type representing the following states:
 - Both
 
 Implements the Bifunctor and MonadThrow interfaces in fp-ts.
+
+> Useful when loading data that can be loaded and then later updated.
 
 ### Constructors
 
@@ -125,11 +131,33 @@ Each constructor that accepts a value (`failure, success, both`) also requires a
 
 ## Planned: IncrementalData
 
-## Planned: RefreshableIncrementalData
+### Description
+A union type representing the following states:
+- Initial
+- Pending
+- Failure
+- Success
+
+> Useful when loading data who's progress can be observed.
+
+## Planned: IncrementalRefreshableData
+
+### Description
+
+A union type representing the following states:
+- Initial
+- Pending
+- Failure
+- Success
+- Both
+
+> Useful when loading data who's progress can be observed and when fully loaded can be later updated.
 
 ## Transition and use with State Management
 
 Each of these ADTs can be used as models for a state store. The transition function is provided to create state transitions between subtypes of the provided ADTs. Transition creates a function that accepts an ADT instance and returns a new ADT instance. Transition accepts an object in which keys are ADT subtypes and values are functions from that subtype's value to a new ADT subtype. Any ADT subtypes that are not included as keys in the argument are mapped back to their original values in the resulting function. 
+
+### With RemoteData:
 
 In the following example: 
 - the reset action transitions all states to the initial state
@@ -137,10 +165,9 @@ In the following example:
 - the failure action transitions the pending state to the failure state and all other states remain unchanged
 - the success action transitions the pending state to the failure state and all other states remain unchanged
 
-Redux Example:
+Example:
 
     import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-    import { constant } from 'fp-ts/lib/function';
     import * as RD from  'fp-remote-data/lib/RemoteData';
 
     type Todo = {
@@ -167,3 +194,42 @@ Redux Example:
                 })(s as TodosState),
         },
     });
+
+### With RefreshableData:
+
+In the following example: 
+- the reset action transitions all states to the initial state
+- the fetch action transitions the init state to the pending state and transforms the error and success states to indicate a refresh
+- the failure action transitions the pending state to the failure state, updates the failure state, transitions the success state to the both state and updates the both state 
+- the success action transitions all states to the success state
+
+Example:
+
+    import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+    import { constant } from 'fp-ts/lib/function';
+    import * as RD from 'fp-remote-data/lib/RefreshableData';
+
+    export const createRemoteDataSlice = <E, A>(name: string) =>
+        createSlice({
+            name,
+            initialState: RD.init() as RD.RefreshableData<E, A>,
+            reducers: {
+                reset: RD.init,
+                fetch: (s) =>
+                    RD.transition<E, A>({
+                        init: RD.pending,
+                        success: (result) => RD.success(result, true),
+                        failure: (error) => RD.failure(error, true),
+                        both: (error, result) => RD.both(error, result, true),
+                    })(s as RD.RefreshableData<E, A>),
+                failure: (s, a: PayloadAction<{ error: E }>) =>
+                    RD.transition<E, A>({
+                        pending: constant(RD.failure(a.payload.error, false)),
+                        success: (result) => RD.both(a.payload.error, result, false),
+                        failure: constant(RD.failure(a.payload.error, false)),
+                        both: (_, result) => RD.both(a.payload.error, result, false),
+                    })(s as RD.RefreshableData<E, A>),
+                success: (s, a: PayloadAction<{ result: A }>) =>
+                    RD.success(a.payload.result, false)
+            },
+        });
