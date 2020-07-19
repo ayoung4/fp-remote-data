@@ -219,22 +219,22 @@ Example:
             fetch: (s) =>
                 RD.transition<Error, Todo[]>({
                     init: RD.pending,
-                    success: (result) => RD.success(result, true),
                     failure: (error) => RD.failure(error, true),
+                    success: (result) => RD.success(result, true),
                     both: (error, result) => RD.both(error, result, true),
                 })(s as TodosState),
             failure: (s, a: PayloadAction<{ error: Error }>) =>
                 RD.transition<Error, Todo[]>({
                     pending: () => RD.failure(a.payload.error, false),                        
-                    success: (result) => RD.both(a.payload.error, result, false),
                     failure: () => RD.failure(a.payload.error, false),
+                    success: (result) => RD.both(a.payload.error, result, false),
                     both: (_, result) => RD.both(a.payload.error, result, false),
                 })(s as TodosState),
             success: (s, a: PayloadAction<{ result: Todo[] }>) =>
                 RD.transition<Error, Todo[]>({
                     pending: () => RD.success(a.payload.result, false),
-                    success: () => RD.success(a.payload.result, false),
                     failure: () => RD.success(a.payload.result, false),
+                    success: () => RD.success(a.payload.result, false),
                     both: () => RD.success(a.payload.result, false),
                 })(s as TodosState),
         },
