@@ -66,7 +66,7 @@ Implements the Bifunctor and MonadThrow interfaces in fp-ts.
 
 ## RefreshableData
 
-**Useful when loading data that can be loaded and then later updated.**
+**Useful when data can be loaded and then later updated.**
 
 ### Description
 
