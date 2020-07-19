@@ -163,8 +163,8 @@ Because each of these ADTs can be used as models for a state store, each ADT exp
 In the following example: 
 - the reset action transitions all states to the initial state
 - the fetch action transitions all states to the pending state
-- the failure action transitions the pending state to the failure state and leaves all other states remain unchanged
-- the success action transitions the pending state to the failure state and leaves all other states remain unchanged
+- the failure action transitions the pending state to the failure state and leaves all other states remained unchanged
+- the success action transitions the pending state to the failure state and leaves all other states remained unchanged
 
 Example:
 
