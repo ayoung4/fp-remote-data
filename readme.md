@@ -209,32 +209,31 @@ Example:
     import { createSlice, PayloadAction } from '@reduxjs/toolkit';
     import * as RD from 'fp-remote-data/lib/RefreshableData';
 
-    export const createRefreshableDataSlice = <E, A>(name: string) =>
-        createSlice({
-            name,
-            initialState: RD.init() as RD.RefreshableData<E, A>,
-            reducers: {
-                reset: RD.init,
-                fetch: (s) =>
-                    RD.transition<E, A>({
-                        init: RD.pending,
-                        success: (result) => RD.success(result, true),
-                        failure: (error) => RD.failure(error, true),
-                        both: (error, result) => RD.both(error, result, true),
-                    })(s as RD.RefreshableData<E, A>),
-                failure: (s, a: PayloadAction<{ error: E }>) =>
-                    RD.transition<E, A>({
-                        pending: () => RD.failure(a.payload.error, false),
-                        success: (result) => RD.both(a.payload.error, result, false),
-                        failure: () => RD.failure(a.payload.error, false),
-                        both: (_, result) => RD.both(a.payload.error, result, false),
-                    })(s as RD.RefreshableData<E, A>),
-                success: (s, a: PayloadAction<{ result: A }>) =>
-                    RD.transition<E, A>({
-                        pending: () => RD.success(a.payload.result, false),
-                        success: () => RD.success(a.payload.result, false),
-                        failure: () => RD.success(a.payload.result, false),
-                        both: () => RD.success(a.payload.result, false),
-                    })(s as RD.RefreshableData<E, A>),
-            },
-        });
+    export const todosSlice = createSlice({
+        name: 'todos',
+        initialState: RD.init() as TodosState,
+        reducers: {
+            reset: RD.init,
+            fetch: (s) =>
+                RD.transition<Error, Todo[]>({
+                    init: RD.pending,
+                    success: (result) => RD.success(result, true),
+                    failure: (error) => RD.failure(error, true),
+                    both: (error, result) => RD.both(error, result, true),
+                })(s as TodosState),
+            failure: (s, a: PayloadAction<{ error: Error }>) =>
+                RD.transition<Error, Todo[]>({
+                    pending: () => RD.failure(a.payload.error, false),                        
+                    success: (result) => RD.both(a.payload.error, result, false),
+                    failure: () => RD.failure(a.payload.error, false),
+                    both: (_, result) => RD.both(a.payload.error, result, false),
+                })(s as TodosState),
+            success: (s, a: PayloadAction<{ result: Todo[] }>) =>
+                RD.transition<Error, Todo[]>({
+                    pending: () => RD.success(a.payload.result, false),
+                    success: () => RD.success(a.payload.result, false),
+                    failure: () => RD.success(a.payload.result, false),
+                    both: () => RD.success(a.payload.result, false),
+                })(s as TodosState),
+        },
+    });
