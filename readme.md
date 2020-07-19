@@ -125,7 +125,7 @@ Each constructor that accepts a value (`failure, success, both`) also requires a
 
 ## Transition and use with State Management
 
-Each of these ADTs can be used as models for a state store. The transition function is provided to create state transitions between subtypes of the provided ADTs. Transition creates a function that accepts an ADT instance and returns a new ADT instance. It accepts an object in which keys are ADT subtypes and values are functions from a subtype to a new ADT subtype. Any ADT subtypes that are not included as keys are mapped back to their original values in the resulting function. 
+Each of these ADTs can be used as models for a state store. The transition function is provided to create state transitions between subtypes of the provided ADTs. Transition creates a function that accepts an ADT instance and returns a new ADT instance. Transition accepts an object in which keys are ADT subtypes and values are functions from that subtype's value to a new ADT subtype. Any ADT subtypes that are not included as keys in the argument are mapped back to their original values in the resulting function. 
 
 In the following example: 
 - the reset action transitions all states to the initial state
@@ -139,13 +139,13 @@ Redux Example:
     import { constant } from 'fp-ts/lib/function';
     import * as RD from  'fp-remote-data/lib/RemoteData';
 
-    type Todos = {
+    type Todo = {
 	    id: number;
 	    description: string;
 	    done: boolean;
     };
     
-    type TodosState = RD.RemoteData<Error, Todos[]>
+    type TodosState = RD.RemoteData<Error, Todo[]>
     
     export const todosSlice = createSlice({
 	    name: 'todos',
@@ -154,12 +154,12 @@ Redux Example:
             reset: RD.init,
             fetch: RD.pending,
             failure: (s, a: PayloadAction<{ error:  Error }>) =>
-                RD.transition<Error, Todos[]>({
-                    pending: constant(RD.failure(a.payload.error)),
+                RD.transition<Error, Todo[]>({
+                    pending: () => RD.failure(a.payload.error),
                 })(s as TodosState),
-            success: (s, a: PayloadAction<{ result:  Todos[] }>) =>
-                RD.transition<Error, Todos[]>({
-                    pending: constant(RD.success(a.payload.result)),
-            })(s as TodosState),
+            success: (s, a: PayloadAction<{ result:  Todo[] }>) =>
+                RD.transition<Error, Todo[]>({
+                    pending: () => RD.success(a.payload.result),
+                })(s as TodosState),
         },
     });
