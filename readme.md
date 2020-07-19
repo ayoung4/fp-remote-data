@@ -163,8 +163,8 @@ Each of these ADTs can be used as models for a state store. The transition funct
 In the following example: 
 - the reset action transitions all states to the initial state
 - the fetch action transitions all states to the pending state
-- the failure action transitions the pending state to the failure state and all other states remain unchanged
-- the success action transitions the pending state to the failure state and all other states remain unchanged
+- the failure action transitions the pending state to the failure state and leaves all other states remain unchanged
+- the success action transitions the pending state to the failure state and leaves all other states remain unchanged
 
 Example:
 
@@ -202,7 +202,7 @@ In the following example:
 - the reset action transitions all states to the initial state
 - the fetch action transitions the init state to the pending state and updates the error, success and both states to indicate a refresh
 - the failure action transitions the pending state to the failure state, updates the failure state, transitions the success state to the both state and updates the both state 
-- the success action transitions all states to the success state
+- the success action transitions the pending, failure and both states to the success state, updates the success state and leaves all other states unchanged
 
 Example:
 
@@ -230,6 +230,11 @@ Example:
                         both: (_, result) => RD.both(a.payload.error, result, false),
                     })(s as RD.RefreshableData<E, A>),
                 success: (s, a: PayloadAction<{ result: A }>) =>
-                    RD.success(a.payload.result, false)
+                    RD.transition<E, A>({
+                        pending: () => RD.success(a.payload.result, false),
+                        success: (result) => RD.success(a.payload.result, false),
+                        failure: () => RD.success(a.payload.result, false),
+                        both: (_, result) => RD.success(a.payload.result, false),
+                    })(s as RD.RefreshableData<E, A>),
             },
         });
