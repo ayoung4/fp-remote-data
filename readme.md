@@ -131,9 +131,9 @@ Each constructor that accepts a value (`failure, success, both`) also requires a
 
 ## Planned: IncrementalData
 
-### Description
-
 **Useful when loading data who's progress can be observed.**
+
+### Description
 
 A union type representing the following states:
 - Initial
