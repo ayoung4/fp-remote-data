@@ -232,9 +232,9 @@ Example:
                 success: (s, a: PayloadAction<{ result: A }>) =>
                     RD.transition<E, A>({
                         pending: () => RD.success(a.payload.result, false),
-                        success: (result) => RD.success(a.payload.result, false),
+                        success: () => RD.success(a.payload.result, false),
                         failure: () => RD.success(a.payload.result, false),
-                        both: (_, result) => RD.success(a.payload.result, false),
+                        both: () => RD.success(a.payload.result, false),
                     })(s as RD.RefreshableData<E, A>),
             },
         });
