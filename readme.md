@@ -207,7 +207,6 @@ In the following example:
 Example:
 
     import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-    import { constant } from 'fp-ts/lib/function';
     import * as RD from 'fp-remote-data/lib/RefreshableData';
 
     export const createRefreshableDataSlice = <E, A>(name: string) =>
@@ -225,9 +224,9 @@ Example:
                     })(s as RD.RefreshableData<E, A>),
                 failure: (s, a: PayloadAction<{ error: E }>) =>
                     RD.transition<E, A>({
-                        pending: constant(RD.failure(a.payload.error, false)),
+                        pending: () => RD.failure(a.payload.error, false),
                         success: (result) => RD.both(a.payload.error, result, false),
-                        failure: constant(RD.failure(a.payload.error, false)),
+                        failure: () => RD.failure(a.payload.error, false),
                         both: (_, result) => RD.both(a.payload.error, result, false),
                     })(s as RD.RefreshableData<E, A>),
                 success: (s, a: PayloadAction<{ result: A }>) =>
