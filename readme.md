@@ -45,7 +45,7 @@ Implements the Bifunctor and MonadThrow interfaces in fp-ts.
     const success: State = RD.success(name); // success Name
     
     RD.fromOption(() => err)(O.none); // failure Error
-    RD.fromOption(() => err)(O.some(name)); // failure Name
+    RD.fromOption(() => err)(O.some(name)); // success Name
     
     RD.fromEither(E.left(err)); // failure Error
     RD.fromEither(E.right(name)); // success Name
@@ -101,7 +101,7 @@ Each constructor that accepts a value (`failure, success, both`) also requires a
     const both: State = RD.both(err, name, false); // both Error, Name, not refreshing
       
     RD.fromOption(() => err)(O.none); // failure Error, not refreshing
-    RD.fromOption(() => err)(O.some(name)); // failure Name, not refreshing
+    RD.fromOption(() => err)(O.some(name)); // success Name, not refreshing
     
     RD.fromEither(E.left(err)); // failure Error, not refreshing
     RD.fromEither(E.right(name)); // success Name, not refreshing
