@@ -153,7 +153,7 @@ A union type representing the following states:
 
 > Useful when loading data who's progress can be observed and when fully loaded can be later updated.
 
-## Transition and use with State Management
+## Transition and use with Redux
 
 Each of these ADTs can be used as models for a state store. The transition function is provided to create state transitions between subtypes of the provided ADTs. Transition creates a function that accepts an ADT instance and returns a new ADT instance. Transition accepts an object in which keys are ADT subtypes and values are functions from that subtype's value to a new ADT subtype. Any ADT subtypes that are not included as keys in the argument are mapped back to their original values in the resulting function. 
 
