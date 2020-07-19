@@ -1,7 +1,7 @@
 # fp-remote-data
 
 ## Overview
-A collection of ADTs representing data that must be fetched asynchronously, inspired by [@devexperts/remote-data-ts](https://github.com/devexperts/remote-data-ts). Provides a wider range of ADTs for more specific use cases, such as a feed that displays data that can be refreshed. Additionally, each ADT provides a transition function that makes it easy to use the ADT as an implementation of a finite state machine within a state management system such as redux. **Part of the fp-ts ecosystem.**
+A collection of ADTs representing data that must be fetched asynchronously, inspired by [@devexperts/remote-data-ts](https://github.com/devexperts/remote-data-ts). Provides a wider range of ADTs for more specific use cases, such as a feed that displays data that can be refreshed. Additionally, each ADT provides a transition function that makes it easy to use the ADT as an implementation of a finite state machine within a state management system such as redux. **WIP, NOT SAFE FOR PRODUCTION. Part of the fp-ts ecosystem.**
 
 ## Installation
 npm:
@@ -122,6 +122,10 @@ Each constructor that accepts a value (`failure, success, both`) also requires a
     greet(RD.success(name, true)) // Hello Alfred Young, refreshing.
     greet(RD.both(err, name, false)) // Failed to refresh name: Error: something went wrong. Hello Alfred Young, not refreshing.
     greet(RD.both(err, name, true)) // Failed to refresh name: Error: something went wrong. Hello Alfred Young, refreshing.
+
+## Planned: IncrementalData
+
+## Planned: RefreshableIncrementalData
 
 ## Transition and use with State Management
 
