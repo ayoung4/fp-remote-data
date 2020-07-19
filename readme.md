@@ -86,6 +86,7 @@ Each constructor that accepts a value (`failure, success, both`) also requires a
     import * as RD from  'fp-remote-data/lib/RefreshableData';
     import * as O from  'fp-ts/lib/Option';
     import * as E from  'fp-ts/lib/Either';
+    import * as T from  'fp-ts/lib/These';
     
     type Name = { first: string; last: string; };
     
