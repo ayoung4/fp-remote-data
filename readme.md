@@ -209,6 +209,14 @@ Example:
     import { createSlice, PayloadAction } from '@reduxjs/toolkit';
     import * as RD from 'fp-remote-data/lib/RefreshableData';
 
+    type Todo = {
+        id: number;
+        description: string;
+        done: boolean;
+    };
+
+    type TodosState = RD.RefreshableData<Error, Todo[]>
+
     export const todosSlice = createSlice({
         name: 'todos',
         initialState: RD.init() as TodosState,
