@@ -198,12 +198,6 @@ Example:
 
 ### With RefreshableData:
 
-In the following example: 
-- the reset action transitions all states to the initial state
-- the fetch action transitions the init state to the pending state and updates the error, success and both states to indicate a refresh
-- the failure action transitions the pending state to the failure state, updates the failure state, transitions the success state to the both state and updates the both state 
-- the success action transitions the pending, failure and both states to the success state, updates the success state and leaves all other states unchanged
-
 Example:
 
     import { createSlice, PayloadAction } from '@reduxjs/toolkit';
