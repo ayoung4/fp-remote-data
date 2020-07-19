@@ -14,7 +14,7 @@ yarn:
 
 ## RemoteData
 
-> Useful when loading data that should only be loaded once.
+**Useful when loading data that should only be loaded once.**
 
 ### Description
 
@@ -66,7 +66,7 @@ Implements the Bifunctor and MonadThrow interfaces in fp-ts.
 
 ## RefreshableData
 
-> Useful when loading data that can be loaded and then later updated.
+**Useful when loading data that can be loaded and then later updated.**
 
 ### Description
 
@@ -133,7 +133,7 @@ Each constructor that accepts a value (`failure, success, both`) also requires a
 
 ### Description
 
-> Useful when loading data who's progress can be observed.
+**Useful when loading data who's progress can be observed.**
 
 A union type representing the following states:
 - Initial
@@ -143,7 +143,7 @@ A union type representing the following states:
 
 ## Planned: IncrementalRefreshableData
 
-> Useful when loading data who's progress can be observed and when fully loaded can be later updated.
+**Useful when loading data who's progress can be observed and when fully loaded can be later updated.**
 
 ### Description
 
@@ -156,7 +156,7 @@ A union type representing the following states:
 
 ## Transition and use with Redux
 
-Each of these ADTs can be used as models for a state store. The transition function is provided to create state transitions between subtypes of the provided ADTs. Transition creates a function that accepts an ADT instance and returns a new ADT instance. Transition accepts an object in which keys are ADT subtypes and values are functions from that subtype's value to a new ADT subtype. Any ADT subtypes that are not included as keys in the argument are mapped back to their original values in the resulting function. 
+Because each of these ADTs can be used as models for a state store, each ADT exports a transition function. The transition function is used to create state transitions between the ADT subtypes. Transition creates a function that accepts an ADT instance and returns a new ADT instance (aka a state transition). Transition accepts an object in which keys are ADT subtypes and values are functions from that subtype's value to a new ADT instance. Any ADT subtypes that are not included as keys in the argument are mapped back to their original values in the resulting function. 
 
 ### With RemoteData:
 
