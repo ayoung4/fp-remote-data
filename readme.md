@@ -209,7 +209,7 @@ Example:
     import { constant } from 'fp-ts/lib/function';
     import * as RD from 'fp-remote-data/lib/RefreshableData';
 
-    export const createRemoteDataSlice = <E, A>(name: string) =>
+    export const createRefreshableDataSlice = <E, A>(name: string) =>
         createSlice({
             name,
             initialState: RD.init() as RD.RefreshableData<E, A>,
