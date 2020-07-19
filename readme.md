@@ -14,6 +14,8 @@ yarn:
 
 ## RemoteData
 
+> Useful when loading data that should only be loaded once.
+
 ### Description
 
 A union type representing the following states:
@@ -23,8 +25,6 @@ A union type representing the following states:
 - Success
 
 Implements the Bifunctor and MonadThrow interfaces in fp-ts.
-
-> Useful when loading data that should only be loaded once.
 
 ### Constructors
 
@@ -66,6 +66,8 @@ Implements the Bifunctor and MonadThrow interfaces in fp-ts.
 
 ## RefreshableData
 
+> Useful when loading data that can be loaded and then later updated.
+
 ### Description
 
 A union type representing the following states:
@@ -76,8 +78,6 @@ A union type representing the following states:
 - Both
 
 Implements the Bifunctor and MonadThrow interfaces in fp-ts.
-
-> Useful when loading data that can be loaded and then later updated.
 
 ### Constructors
 
@@ -132,15 +132,18 @@ Each constructor that accepts a value (`failure, success, both`) also requires a
 ## Planned: IncrementalData
 
 ### Description
+
+> Useful when loading data who's progress can be observed.
+
 A union type representing the following states:
 - Initial
 - Pending
 - Failure
 - Success
 
-> Useful when loading data who's progress can be observed.
-
 ## Planned: IncrementalRefreshableData
+
+> Useful when loading data who's progress can be observed and when fully loaded can be later updated.
 
 ### Description
 
@@ -150,8 +153,6 @@ A union type representing the following states:
 - Failure
 - Success
 - Both
-
-> Useful when loading data who's progress can be observed and when fully loaded can be later updated.
 
 ## Transition and use with Redux
 
