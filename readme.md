@@ -123,9 +123,9 @@ Each constructor that accepts a value (`failure, success, both`) also requires a
     greet(RD.both(err, name, false)) // Failed to refresh name: Error: something went wrong. Hello Alfred Young, not refreshing.
     greet(RD.both(err, name, true)) // Failed to refresh name: Error: something went wrong. Hello Alfred Young, refreshing.
 
-## Transition and use with Redux
+## Transition and use with State Management
 
-Each of these ADTs can be used as models for a redux store. The transition function is provided to create state transitions between subtypes of the provided ADTs. Transition creates a function that accepts a RemoteData and returns a new RemoteData. It accepts an object in which keys are RemoteData subtypes and values are functions from a subtype to a new RemoteData instance. Any RemoteData subtypes that are not included as keys are mapped back to their original values in the resulting function. 
+Each of these ADTs can be used as models for a state store. The transition function is provided to create state transitions between subtypes of the provided ADTs. Transition creates a function that accepts an ADT instance and returns a new ADT instance. It accepts an object in which keys are ADT subtypes and values are functions from a subtype to a new ADT subtype. Any ADT subtypes that are not included as keys are mapped back to their original values in the resulting function. 
 
 In the following example: 
 - the reset action transitions all states to the initial state
@@ -133,9 +133,10 @@ In the following example:
 - the failure action transitions the pending state to the failure state and all other states remain unchanged
 - the success action transitions the pending state to the failure state and all other states remain unchanged
 
-Example:
+Redux Example:
 
     import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+    import { constant } from 'fp-ts/lib/function';
     import * as RD from  'fp-remote-data/lib/RemoteData';
 
     type Todos = {
@@ -150,15 +151,15 @@ Example:
 	    name: 'todos',
 	    initialState: RD.init() as TodosState,
 	    reducers: {
-		    reset: RD.init,
-		    fetch: RD.pending,
-		    failure: (s, a: PayloadAction<{ error:  Error }>) =>
-			    RD.transition<Error, Todos[]>({
-				    pending: constant(RD.failure(a.payload.error)),
-			    })(s as TodosState),
-		    success: (s, a: PayloadAction<{ result:  Todos[] }>) =>
-			    RD.transition<Error, Todos[]>({
-				    pending: constant(RD.success(a.payload.result)),
-			    })(s as TodosState),
-	    },
+            reset: RD.init,
+            fetch: RD.pending,
+            failure: (s, a: PayloadAction<{ error:  Error }>) =>
+                RD.transition<Error, Todos[]>({
+                    pending: constant(RD.failure(a.payload.error)),
+                })(s as TodosState),
+            success: (s, a: PayloadAction<{ result:  Todos[] }>) =>
+                RD.transition<Error, Todos[]>({
+                    pending: constant(RD.success(a.payload.result)),
+            })(s as TodosState),
+        },
     });
